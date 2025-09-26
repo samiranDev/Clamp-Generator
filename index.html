@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Universal Clamp Generator</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto; padding:18px; max-width:920px;}
+  textarea,input,select{width:100%; padding:10px; margin:8px 0; box-sizing:border-box;}
+  pre{background:#0f1720;color:#dbeafe;padding:12px;border-radius:8px;overflow:auto}
+  label{display:block;margin-top:8px}
+  .row{display:flex; gap:8px}
+  .row > *{flex:1}
+</style>
+</head>
+<body>
+  <h1>Universal Clamp Generator</h1>
+  <p>Paste numbers (px) separated by commas/spaces/newlines. Use a prefix to force type: <code>f:20</code> (font), <code>mp:60</code> (margin/padding), <code>w:300</code> (width/height). If no prefix, selected <strong>Mode</strong> applies (or choose <em>Auto</em>).</p>
+
+  <textarea id="values" rows="5" placeholder="e.g. 16, 20, 30, mp:60, f:48, 120">16,20,30,50,70,80,130,160</textarea>
+
+  <div class="row">
+    <label>Desktop width (px): <input id="desktop" type="number" value="1920"></label>
+    <label>Mobile min floor for fonts (px): <input id="fontFloor" type="number" value="14"></label>
+  </div>
+
+  <label>Mode:
+    <select id="mode">
+      <option value="auto">Auto (decides by value)</option>
+      <option value="font">Font</option>
+      <option value="mp">Margin/Padding</option>
+      <option value="wh">Width/Height</option>
+    </select>
+  </label>
+
+  <label>Output prefix (CSS variable name prefix): <input id="prefix" type="text" value="--size"></label>
+
+  <button onclick="generate()">Generate</button>
+
+  <h3>Result (CSS custom properties)</h3>
+  <pre id="out"></pre>
+
+<script>
+function parseTokens(input){
+  // returns array of {kind, val}
+  const parts = input.split(/[\s,]+/).map(s=>s.trim()).filter(Boolean);
+  const out = [];
+  for(const p of parts){
+    // forced prefix f: mp: w:
+    const m = p.match(/^(f:|mp:|w:|wh:)?(-?\d+(\.\d+)?)/i);
+    if(m){
+      const prefix = (m[1] || "").replace(":", "");
+      const val = parseFloat(m[2]);
+      let kind = 'auto';
+      if(prefix==='f') kind='font';
+      else if(prefix==='mp') kind='mp';
+      else if(prefix==='w' || prefix==='wh') kind='wh';
+      else kind='auto';
+      out.push({kind, val});
+    } else {
+      // try plain number only
+      const num = parseFloat(p);
+      if(!isNaN(num)) out.push({kind:'auto', val:num});
+    }
+  }
+  return out;
+}
+
+function vwFor(val, desktop){
+  return ((val/desktop)*100).toFixed(3);
+}
+
+// heuristics: returns ratio (min/max)
+function pickRatio(val, forcedKind, fontFloor){
+  // forcedKind: 'font'|'mp'|'wh'|'auto'
+  // use heuristics:
+  const kind = forcedKind === 'auto' ? (Math.abs(val) <= 32 ? 'font' : 'mp') : forcedKind;
+
+  if(kind === 'font'){
+    if(Math.abs(val) <= fontFloor) return 1; // keep fixed
+    if(Math.abs(val) <= 18) return Math.max(fontFloor/Math.abs(val), 0.7); // keep close to floor (16->14)
+    if(Math.abs(val) <= 32) return 0.70; // small headings
+    if(Math.abs(val) <= 58) return 0.60;
+    return 0.50; // huge display
+  }
+
+  if(kind === 'mp'){
+    const abs = Math.abs(val);
+    if(abs <= 20) return 0.7;
+    if(abs <= 60) return 0.5;
+    if(abs <= 120) return 0.45;
+    return 0.40;
+  }
+
+  // width/height (block-level) — more conservative for very large sizes
+  if(kind === 'wh'){
+    const abs = Math.abs(val);
+    if(abs <= 50) return 0.7;
+    if(abs <= 200) return 0.5;
+    return 0.45;
+  }
+
+  // fallback
+  return 0.5;
+}
+
+function generate(){
+  const input = document.getElementById('values').value;
+  const desktop = Number(document.getElementById('desktop').value) || 1920;
+  const mode = document.getElementById('mode').value; // auto/font/mp/wh
+  const prefix = document.getElementById('prefix').value.replace(/[^_a-zA-Z0-9\-]/g,'') || '--size';
+  const fontFloor = Number(document.getElementById('fontFloor').value) || 14;
+
+  const tokens = parseTokens(input);
+  let out = '';
+
+  tokens.forEach((t)=>{
+    const val = t.val;
+    const forced = (t.kind === 'auto') ? mode : t.kind; // if token had explicit prefix we use it
+    const ratio = pickRatio(val, forced, fontFloor);
+    let min = Math.round(Math.abs(val) * ratio);
+    if(forced === 'font'){
+      if(min < fontFloor) min = fontFloor;
+    }
+    // keep sign for negative values
+    const sign = val < 0 ? '-' : '';
+    const absVal = Math.abs(val);
+
+    const vw = vwFor(absVal, desktop);
+    // create a readable css variable name
+    const cleanName = `${prefix}-${absVal}`.replace(/\./g,'_');
+    out += `${cleanName}: clamp(${sign}${min}px, ${sign}${vw}vw, ${sign}${absVal}px);\n`;
+  });
+
+  document.getElementById('out').textContent = out;
+}
+</script>
+</body>
+</html>
