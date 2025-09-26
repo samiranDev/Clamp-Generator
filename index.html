@@ -4,15 +4,8 @@
 <meta charset="utf-8" />
 <title>Universal Clamp Generator</title>
 <style>
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto; padding:18px; max-width:920px;}
-  textarea,input,select{width:100%; padding:10px; margin:8px 0; box-sizing:border-box;}
-  pre{background:#0f1720;color:#dbeafe;padding:12px;border-radius:8px;overflow:auto}
-  label{display:block;margin-top:8px}
-  .row{display:flex; gap:8px}
-  .row > *{flex:1}
-
-/* ========================
-   Modern UI for Clamp Generator
+  /* ========================
+   Modern Centered UI for Clamp Generator
    ======================== */
 
 /* Root variables */
@@ -27,11 +20,11 @@
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 8px 16px rgba(0,0,0,0.1);
 }
 
-/* Global Styles */
+/* Global Reset */
 * {
   box-sizing: border-box;
 }
@@ -41,17 +34,37 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   margin: 0;
-  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 20px;
 }
 
-h1, h2, h3, h4 {
-  color: var(--color-text);
-  margin-bottom: 12px;
+/* Container card */
+.container {
+  background: var(--color-card);
+  max-width: 900px;
+  width: 100%;
+  padding: 32px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Heading */
+h1 {
+  text-align: center;
+  font-size: clamp(24px, 3vw, 36px);
+  margin-bottom: 8px;
 }
 
 p {
+  text-align: center;
   color: var(--color-text-muted);
-  margin-bottom: 16px;
+  margin-bottom: 24px;
   line-height: 1.5;
 }
 
@@ -59,7 +72,6 @@ p {
 textarea, input, select {
   width: 100%;
   padding: 12px;
-  margin: 8px 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 14px;
@@ -70,25 +82,26 @@ textarea, input, select {
 textarea:focus, input:focus, select:focus {
   border-color: var(--color-primary);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
 }
 
 /* Button */
 button {
   background: var(--color-primary);
   color: #fff;
-  padding: 12px 20px;
+  padding: 14px 24px;
   border: none;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
-  margin-top: 8px;
+  margin-top: 16px;
+  align-self: center;
 }
 
 button:hover {
   background: var(--color-primary-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 button:active {
@@ -98,9 +111,8 @@ button:active {
 /* Flex rows */
 .row {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
 }
 
 .row > * {
@@ -114,16 +126,16 @@ label {
   margin-top: 12px;
 }
 
-/* Preformatted output */
+/* Output pre block */
 pre {
   background: #111827;
   color: #dbeafe;
-  padding: 16px;
+  padding: 20px;
   border-radius: var(--radius-md);
   overflow-x: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
-  margin-top: 12px;
+  margin-top: 16px;
   font-size: 14px;
   box-shadow: var(--shadow-sm);
 }
@@ -142,35 +154,36 @@ textarea {
   }
 }
 
-  
 </style>
 </head>
 <body>
-  <h1>Universal Clamp Generator</h1>
-  <p>Paste numbers (px) separated by commas/spaces/newlines. Use a prefix to force type: <code>f:20</code> (font), <code>mp:60</code> (margin/padding), <code>w:300</code> (width/height). If no prefix, selected <strong>Mode</strong> applies (or choose <em>Auto</em>).</p>
-
-  <textarea id="values" rows="5" placeholder="e.g. 16, 20, 30, mp:60, f:48, 120">16,20,30,50,70,80,130,160</textarea>
-
-  <div class="row">
-    <label>Desktop width (px): <input id="desktop" type="number" value="1920"></label>
-    <label>Mobile min floor for fonts (px): <input id="fontFloor" type="number" value="14"></label>
+  <div class="container">
+    <h1>Universal Clamp Generator</h1>
+    <p>Paste numbers (px) separated by commas/spaces/newlines. Use a prefix to force type: <code>f:20</code> (font), <code>mp:60</code> (margin/padding), <code>w:300</code> (width/height). If no prefix, selected <strong>Mode</strong> applies (or choose <em>Auto</em>).</p>
+  
+    <textarea id="values" rows="5" placeholder="e.g. 16, 20, 30, mp:60, f:48, 120">16,20,30,50,70,80,130,160</textarea>
+  
+    <div class="row">
+      <label>Desktop width (px): <input id="desktop" type="number" value="1920"></label>
+      <label>Mobile min floor for fonts (px): <input id="fontFloor" type="number" value="14"></label>
+    </div>
+  
+    <label>Mode:
+      <select id="mode">
+        <option value="auto">Auto (decides by value)</option>
+        <option value="font">Font</option>
+        <option value="mp">Margin/Padding</option>
+        <option value="wh">Width/Height</option>
+      </select>
+    </label>
+  
+    <label>Output prefix (CSS variable name prefix): <input id="prefix" type="text" value="--size"></label>
+  
+    <button onclick="generate()">Generate</button>
+  
+    <h3>Result (CSS custom properties)</h3>
+    <pre id="out"></pre>
   </div>
-
-  <label>Mode:
-    <select id="mode">
-      <option value="auto">Auto (decides by value)</option>
-      <option value="font">Font</option>
-      <option value="mp">Margin/Padding</option>
-      <option value="wh">Width/Height</option>
-    </select>
-  </label>
-
-  <label>Output prefix (CSS variable name prefix): <input id="prefix" type="text" value="--size"></label>
-
-  <button onclick="generate()">Generate</button>
-
-  <h3>Result (CSS custom properties)</h3>
-  <pre id="out"></pre>
 
 <script>
 function parseTokens(input){
@@ -269,4 +282,3 @@ function generate(){
 </script>
 </body>
 </html>
-
