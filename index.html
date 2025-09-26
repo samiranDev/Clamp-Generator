@@ -10,6 +10,139 @@
   label{display:block;margin-top:8px}
   .row{display:flex; gap:8px}
   .row > *{flex:1}
+
+/* ========================
+   Modern UI for Clamp Generator
+   ======================== */
+
+/* Root variables */
+:root {
+  --color-bg: #f5f6fa;
+  --color-card: #ffffff;
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 24px;
+}
+
+h1, h2, h3, h4 {
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+p {
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* Inputs and textarea */
+textarea, input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: var(--color-card);
+}
+
+textarea:focus, input:focus, select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.2);
+}
+
+/* Button */
+button {
+  background: var(--color-primary);
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 8px;
+}
+
+button:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Flex rows */
+.row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.row > * {
+  flex: 1 1 0;
+}
+
+/* Labels */
+label {
+  display: block;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+/* Preformatted output */
+pre {
+  background: #111827;
+  color: #dbeafe;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-top: 12px;
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Textarea styling */
+textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: monospace;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+  
 </style>
 </head>
 <body>
@@ -136,3 +269,4 @@ function generate(){
 </script>
 </body>
 </html>
+
